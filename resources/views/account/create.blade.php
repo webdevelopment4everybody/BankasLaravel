@@ -34,7 +34,7 @@ $saskNr = 'LT';
                         </div>
                         <div class="form-group">
                             <label>Saskaitos numeris</label>
-                            <input type="text" name="saskNr" value="{{$saskNr}}" class="form-control">
+                            <input type="text" name="saskNr" value="{{$saskNr}}" class="form-control" readonly>
                             <small class="form-text text-muted">Saskaitos numeris </small>
                         </div>
 

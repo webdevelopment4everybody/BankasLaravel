@@ -13,9 +13,12 @@
                             {{ session('status') }}
                         </div>
                     @endif
+<?php
 
-                    {{ __('You are logged in!') }}
-                </div>
+header('Location: http://localhost/BankasLaravel/public/accounts');
+die();
+
+?>
             </div>
         </div>
     </div>

@@ -1,12 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Account;
 use Illuminate\Http\Request;
+use Validator;
 
 class AccountController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -27,6 +31,7 @@ class AccountController extends Controller
     {
         return view('account.create');
 
+
     }
 
     /**
@@ -37,16 +42,37 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(),
+        [
+            'firstname' => ['required', 'min:3', 'max:64'],
+            'lastname' => ['required', 'min:3', 'max:64'],
+            'asmensKodas' => ['required', 'min:11', 'max:11'],
+        ],
+            [
+                'firstname.min' => 'Vardas toks buti negali',
+                'lastname.min' => 'Pavarde tokia buti negali',
+                'asmensKodas.min' => 'Netinkamai ivestas asmens kodas'
+                ]
+        );
+        if ($validator->fails()) {
+            $request->flash();
+            return redirect()->back()->withErrors($validator);
+        }
+       
         $account = new Account;
-        $account->firstname= $request->name;
+        $account->firstname = $request->name;
         $account->lastname = $request->lastname;
         $account->asmensKodas = $request->asmensKodas;
         $account->saskNr = $request->saskNr;
         $account->amount = $request->amount;
         $account->save();
         return redirect()->route('account.index');
-
     }
+
+
+
+
+
 
     /**
      * Display the specified resource.

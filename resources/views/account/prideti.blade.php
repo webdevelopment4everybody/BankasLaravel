@@ -1,4 +1,3 @@
->
 
 @extends('layouts.app')
 
@@ -10,7 +9,8 @@
             <div class="card-header">BANKAS.Pridėti lėšas</div>
                <div class="card-body">
                   {{$account->firstname}}
-                  {{$account->lastname}}
+                  {{$account->lastname}}<br><br>
+                  Saskaitos likutis: {{$account->amount}} eurai(-u).
                <form method="GET" action="{{route('account.prideti',[$account->id])}}">
                   <div class="form-group">
                      <label>Kiek prideti: </label>
@@ -20,6 +20,7 @@
                   </div> 
                   @csrf
                   <button type="submit">Prideti</button>
+                  <i class="fas fa-clock"></i>
                </form>
                </div>
          </div>
