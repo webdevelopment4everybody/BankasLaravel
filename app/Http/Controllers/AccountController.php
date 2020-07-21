@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\StorePostRequest;
 use App\Account;
 use Illuminate\Http\Request;
 use Validator;
@@ -18,7 +19,7 @@ class AccountController extends Controller
      */
     public function index()
     {
-        $accounts = Account::all();
+        $accounts = Account::all()->sortBy('lastname');
         return view('account.index', ['accounts' => $accounts]);
     }
 
@@ -30,8 +31,6 @@ class AccountController extends Controller
     public function create()
     {
         return view('account.create');
-
-
     }
 
     /**
@@ -44,20 +43,24 @@ class AccountController extends Controller
     {
         $validator = Validator::make($request->all(),
         [
-            'firstname' => ['required', 'min:3', 'max:64'],
+            'name' => ['required', 'min:3', 'max:64'],
             'lastname' => ['required', 'min:3', 'max:64'],
-            'asmensKodas' => ['required', 'min:11', 'max:11'],
+            'asmensKodas' => ['required','min:11', 'max:11'],
         ],
             [
-                'firstname.min' => 'Vardas toks buti negali',
-                'lastname.min' => 'Pavarde tokia buti negali',
-                'asmensKodas.min' => 'Netinkamai ivestas asmens kodas'
+                'name.min' => 'Blogai įvestas vardas',
+                'lastname.min' => 'Blogai įvesta pavardė',
+                'asmensKodas.min' => 'Asmens kodas neatitinka formato',
+                'asmensKodas.max' => 'Asmens kodas neatitinka formato'
                 ]
         );
         if ($validator->fails()) {
             $request->flash();
             return redirect()->back()->withErrors($validator);
         }
+        if (Account::where('asmensKodas',$request->asmensKodas)->first()){
+            return redirect()->route('account.index')->withErrors('toks asmuo jau yra');
+        }else{
        
         $account = new Account;
         $account->firstname = $request->name;
@@ -66,14 +69,9 @@ class AccountController extends Controller
         $account->saskNr = $request->saskNr;
         $account->amount = $request->amount;
         $account->save();
-        return redirect()->route('account.index');
+        return redirect()->route('account.index')->with('success_message', 'Vartotojas įrašytas');
     }
-
-
-
-
-
-
+    }
     /**
      * Display the specified resource.
      *
@@ -93,19 +91,44 @@ class AccountController extends Controller
      */
     public function prideti(Request $request, Account $account)
     {
+        if(isset($_GET['amount'])){
+        $validator = Validator::make($request->all(),
+        []
+        );
+        if ($validator->fails()) {
+            $request->flash();
+            return redirect()->back()->withErrors($validator);
+        }
+        if ($request->amount < 0) return redirect()->route('account.index')->withErrors('Negalima pridėti minusinių pinigų.');
         $account->amount+=$request->amount;
         $account->save();
+        return redirect()->route('account.index')->with('success_message', 'Pridėta lėšų');
+    }else{
         // return redirect()->route('account.index');
         return view('account.prideti', ['account' => $account]);
-        // return redirect()->route('account.prideti', ['account'=> $account]);
     }
+}
 
     public function atimti(Request $request, Account $account)
     {
-        $account->amount-=$request->amount;
-        $account->save();
-        // return redirect()->route('account.index');
-        return view('account.atimti', ['account' => $account]);
+        if(isset($_GET['amount'])){
+            $validator = Validator::make($request->all(),
+            []
+            );
+            if ($validator->fails()) {
+                $request->flash();
+                return redirect()->back()->withErrors($validator);
+            }
+            if ($request->amount < 0) return redirect()->route('account.index')->withErrors('Negalima atimti minusinių pinigų.');
+            elseif($request->amount > $account->amount)return redirect()->route('account.index')->withErrors('Sąskaitoje nepakanka lėšų.');
+            $account->amount-=$request->amount;
+            $account->save();
+            // return redirect()->route('account.index');
+            return redirect()->route('account.index')->with('success_message', 'Nuskaičiuota lėšų');
+        }
+        else{
+            return view('account.atimti', ['account' => $account]);
+        }
     }
 
     /**
@@ -126,9 +149,19 @@ class AccountController extends Controller
      * @param  \App\Account  $account
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Account $account)
+    public function destroy(Account $account,Request $request)
     {
+        $validator = Validator::make($request->all(),
+        []
+        );
+        if ($validator->fails()) {
+            $request->flash();
+            return redirect()->back()->withErrors($validator);
+        }
+        
+        if ($account->amount > 0) return redirect()->route('account.index')->withErrors('Negalima trinti šios sąskaitos, nes joje dar yra lėšų.');
         $account->delete();
-        return redirect()->route('account.index');
+        // return redirect()->route('account.index');
+        return redirect()->route('account.index')->with('success_message', 'Sėkmingai ištrintas');
     }
 }

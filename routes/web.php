@@ -36,3 +36,6 @@ Route::group(['prefix' => 'accounts'], function(){
     Route::get('showAll/{account}', 'AccountController@showAll')->name('account.showAll');
  });
  
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

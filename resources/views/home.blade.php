@@ -13,12 +13,13 @@
                             {{ session('status') }}
                         </div>
                     @endif
-<?php
+                    <?php
 
-header('Location: http://localhost/BankasLaravel/public/accounts');
-die();
+                    header('Location: http://localhost/BankasLaravel/public/accounts');
+                    die();
 
-?>
+                    ?>
+                </div>
             </div>
         </div>
     </div>

@@ -26,8 +26,8 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
-                <a class="navbar-brand" href = "http://localhost/BankasLaravel/public/home">Saskaitu sarasas</a>
-                <a class="navbar-brand" href = "http://localhost/BankasLaravel/public/accounts/create">Pridėti naują vartotoją</a>
+                <a class="navbar-brand" style="color:rgb(43, 161, 240);"href = "http://localhost/BankasLaravel/public/home">Sąskaitų sąrašas</a>
+                <a class="navbar-brand" style="color:rgb(43, 161, 240);" href = "http://localhost/BankasLaravel/public/accounts/create">Pridėti naują vartotoją</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -74,6 +74,38 @@
         </nav>
 
         <main class="py-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-9">
+                        @if ($errors->any())
+                        <div class="alert">
+                            <ul class="list-group">
+                                @foreach ($errors->all() as $error)
+                                    <li class="list-group-item list-group-item-danger">{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-9">
+                        
+                        @if(session()->has('success_message'))
+                            <div class="alert alert-success" role="alert">
+                                {{session()->get('success_message')}}
+                            </div>
+                        @endif
+                        @if(session()->has('info_message'))
+                            <div class="alert alert-info" role="alert">
+                                {{session()->get('info_message')}}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
             @yield('content')
         </main>
     </div>
